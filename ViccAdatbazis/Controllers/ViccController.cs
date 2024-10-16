@@ -43,12 +43,12 @@ namespace ViccAdatbazis.Controllers
         }
         //Új vicc feltöltése
         [HttpPost]
-        public async Task<ActionResult> PostVicc(Vicc ujVicc) 
+        public async Task<ActionResult> PostVicc(Vicc ujVicc)
         {
             _context.Viccek.Add(ujVicc);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetVicc", new {id = ujVicc.Id }, ujVicc);
+            return CreatedAtAction("GetVicc", new { id = ujVicc.Id }, ujVicc);
             //Lekéri az adatbázisbol az uj viccet és azzal tér vissza
 
         }
@@ -56,7 +56,7 @@ namespace ViccAdatbazis.Controllers
         //Vicc módosítása
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> PutVicc(int id, Vicc modositottVicc) 
+        public async Task<ActionResult> PutVicc(int id, Vicc modositottVicc)
         {
             if (id != modositottVicc.Id)
             {
@@ -76,7 +76,7 @@ namespace ViccAdatbazis.Controllers
         public async Task<ActionResult> DeleteVicc(int id)
         {
             var torlendoVicc = await _context.Viccek.FindAsync(id);
-            if (torlendoVicc == null) 
+            if (torlendoVicc == null)
             {
                 return NotFound();
             }
@@ -93,5 +93,21 @@ namespace ViccAdatbazis.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
-    }
+
+        //Vicc lájkolása
+        [Route("{id}/like")]  //https://localhost/api/Vicc/1/like
+        [HttpPatch("{id}")]
+        public async Task<ActionResult<string>> Lajkolas(int id)
+        {
+            var vicc = _context.Viccek.Find(id);
+            if (vicc == null)
+            {
+                return NotFound();
+            }
+            vicc.Tetszik++;
+            _context.Entry(vicc).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return Ok(vicc.Tetszik);
+        }
+    } 
 }
